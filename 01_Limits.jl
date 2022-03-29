@@ -43,7 +43,7 @@ Notebook Size & Color Settings
 
 # ╔═╡ 256756d6-d809-4589-b994-5938c8f17675
 # This allows to use the physics package of MathJax and it's LaTex macros. It's a LaTeX call ofc.
-	md"""$\require{physics}$"""
+md"""$\require{physics}$"""
 
 # ╔═╡ 54e7292e-823f-49a2-9463-a7e60c36589d
 TableOfContents(title="Limits of Functions")
@@ -78,7 +78,7 @@ md"""
 Sean $a$ y $b$ dos números reales, entonces
 
 $\begin{equation}
-\boxed{|a+b| \leq |a|+ |b|} 🚀
+\boxed{|a+b| \leq |a|+ |b|}
 \end{equation}$
 - Si ambos $a$ y $b$ son ambos positivos o ambos negativos, se cumple la igualdad.
 - Si tienen signos contrarios, ocurrirá una sustracción, la cual siempre será menor que la suma de los valores absolutos individuales. $\blacksquare$
@@ -94,7 +94,7 @@ $\begin{align}
 # ╔═╡ 566c013f-84d8-4285-a2d9-215634878a4a
 md"""
 ## Reverse Triangle Inequality
- Ahora, por (🚀) tenemos que
+ Ahora, por *Triangle Inequality* tenemos que
 
 $\begin{align}
 |b| = |a+b-a| &\leq |a| + |b-a| \\
@@ -120,7 +120,7 @@ $\begin{align}
 # ╔═╡ 036d2162-49a8-4631-8532-b44cd6b16068
 md"""
 # Definition and Properties
-## ϵ-δ definition of a Limit
+## ϵ-δ definition of a limit
 Sea $x$ una variable, $f(x)$ una función y $x_0$ un valor particular de $x$, entonces un concepto intuitivo para el límite de una función es que, a medida que $x$ se aproxima a $x_0$, $f(x)$ se aproxima al valor límite $L$, i.e. $f(x_0) \approx L$. Sin embargo es necesaria una definición algebraica más rigurosa.
 """
 
@@ -151,10 +151,12 @@ md"""
 Las expresiones de proximidad $x \rightarrow x_0$ y $f(x) \rightarrow L$ pueden definirse matemáticamente como distancias sumamente pequeñas alrededor de $x_0$ y $L$ respectivamente: Sean $ϵ, δ$ números reales positivos sumamente pequeños (para evitar lidiar con "distancias negativas"), entonces las expresiones
 
 $\begin{equation}
-|x − x_0| < δ \qquad \land \qquad |f (x) − L| < ϵ 🚀
+|x − x_0| < δ \qquad \land \qquad |f (x) − L| < ϵ
 \end{equation}$
 
-representan ambos conceptos de proximidad. En conjunto, estas expresiones forman un área rectangular en la que están delimitadas combinaciones $(x, f(x))$ muy cercanas al punto $(x_0, f(x_0))$. A medida que ambos valores $ϵ, δ$ se van reduciendo sin quebrantar la propiedad anterior (🚀), la aproximación va siendo cada vez mejor.
+representan ambos conceptos de proximidad. En conjunto, estas expresiones forman un área rectangular en la que están delimitadas combinaciones $(x, f(x))$ muy cercanas al punto $(x_0, f(x_0))$. A medida que ambos valores $ϵ, δ$ se van reduciendo sin quebrantar la propiedad anterior, la aproximación va siendo cada vez mejor.
+
+Notemos que si $δ$ fuese mayor, entonces $\textcolor{red}{|f(x) − L| < ϵ} \:$ podría no cumplirse para este caso particular (fig. derecha), de modo que tendríamos que elegir un valor $ϵ$ mayor, sin embargo ello implicaría reducir la precisión de la aproximación al límite.
 """
 
 # ╔═╡ eb2ddf37-2196-413a-955c-7e84e82df760
@@ -185,10 +187,7 @@ let
 end
 
 # ╔═╡ 759f4a8e-4fda-465c-a4bc-65f52af912ef
-md"""
-Notemos que si $δ$ fuese mayor, entonces $\textcolor{red}{|f(x) − L| < ϵ} \:$ podría no cumplirse para este caso particular (fig. derecha), de modo que tendríamos que elegir un valor $ϵ$ mayor, sin embargo ello implicaría reducir la precisión de la aproximación al límite.
-
-Asumiendo que el límite existe y es $L$ (i.e. $\displaystyle\lim_{x \to x_0} f(x) = L$), el proceso de aproximación sería infinito ya que siempre podríamos encontrar una combinación de números $\epsilon$ y $\delta$ que delimiten válidamente los valores que $(x, f[x])$ pueda tomar sin llegar a ser exactamente $(x_0, f[x_0])$, lo que no sucede, por ejemplo, en funciones definidas por partes
+md"""Asumiendo que el límite existe y es $L$ (i.e. $\displaystyle\lim_{x \to x_0} f(x) = L$), el proceso de aproximación sería infinito ya que siempre podríamos encontrar una combinación de números $\epsilon$ y $\delta$ que delimiten válidamente los valores que $(x, f[x])$ pueda tomar sin llegar a ser exactamente $(x_0, f[x_0])$, lo que no sucede, por ejemplo, en funciones definidas por partes
 """
 
 
@@ -477,12 +476,11 @@ Finalmente, es suficiente que $\delta \leq \min\left(1, \frac{\epsilon}{7}\right
 
 # ╔═╡ 0f374503-9eee-4ed5-a5ed-dbec6a67ef47
 md"""
-## Infinite Limit at Infinity
+## Infinite limit at infinity
 !!! warning
-	- Aparentemente si un límite es igual a $\infty$, entonces el límite en realidad no existe.
-	- [Fuente 1](https://math.stackexchange.com/questions/127689/why-does-an-infinite-limit-not-exist)
-	- Voy a dejar en stand by los comentarios de esta y de la siguiente subsección por ahora. Solo pondré lo que tengo en PDF.
-Examples:
+	- Si un límite es igual a $\infty$, entonces en realidad no existe. Es válido, sin embargo, expresarlo utilizando la notación de límites.
+	- [Algunos comentarios](https://math.stackexchange.com/questions/127689/why-does-an-infinite-limit-not-exist)
+Ejemplos:
 """
 
 # ╔═╡ c8fc7960-689a-40d7-b006-cc5b7ebc32bc
@@ -525,8 +523,8 @@ $\begin{align}
 
 # ╔═╡ 103dcdca-d8b3-4d1b-bdd9-cf9fd9394cd0
 md"""
-## Infinite Limit for finite x
-Example:
+## Infinite limit for finite x
+Ejemplo:
 """
 
 # ╔═╡ 20c263e1-13f7-47ae-b871-00531e577a0b
@@ -555,8 +553,8 @@ $\begin{align}
 
 # ╔═╡ 6caa763d-0eaa-472e-bae4-f24bcc0cdfb7
 md"""
-## Finite Limit at Infinity
-Example:
+## Finite limit at infinity
+Ejemplo:
 """
 
 # ╔═╡ 9d686422-85d6-4e66-bcfa-19c869434305
@@ -614,6 +612,11 @@ $\begin{align}
 0 < |x-x_0|<\delta \implies |f(x)-L_1| < \epsilon_1 \quad \land \quad |g(x)-L_2| < \epsilon_2
 \end{align}$
 
+!!! importante
+	Ya que el antecedente y ambos consecuentes son verdaderos, es válido derivar nuevas conclusiones con estos últimos, e.g.
+	-  $x<3 \implies x+2 < 5 \: \land \: x^2 < 9$
+	-  $x<3 \implies x^2 + x+2 < 14$
+
 La conclusión anterior también puede comprobarse visualmente. Digamos que $g(x)$ es la función azul. Observa cómo $|g(x)-L_2|$ es cada vez menor que $\epsilon_2$
 """
 
@@ -657,11 +660,7 @@ $\begin{align}
 0 < |x - x_0| < \delta &\implies |f(x)-L_1 + g(x)-L_2| < \epsilon &&\text{(Triang. Ineq.)} \\
 0 < |x - x_0| < \delta &\implies \Big|[f(x) + g(x)]- (L_1 + L_2)\Big| < \epsilon && \blacksquare
 \end{align}$
-
-!!! importante
-	Ya que el antecedente y ambos consecuentes son verdaderos, es válido derivar nuevas conclusiones con estos últimos, e.g.
-	-  $x<3 \implies x+2 < 5 \: \land \: x^2 < 9$
-	-  $x<3 \implies x^2 + x+2 < 14$"""
+"""
 
 # ╔═╡ f5d6c493-0b90-4e8d-8ce9-1934fa8bdf78
 md"""

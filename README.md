@@ -1,7 +1,7 @@
 # Website
 [Página principal](https://jorbnc.github.io/SVC/index.html)
 
-# Contenido
+# Contents
 
 - Limits
   - Epsilon-delta definition
