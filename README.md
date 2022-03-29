@@ -9,7 +9,7 @@
 - Continuity
 - Derivatives
 
-# Pluto Static Export Template
+# About
 
 Repositorio creado utilizando [static-export-template](https://github.com/JuliaPluto/static-export-template/)
 
