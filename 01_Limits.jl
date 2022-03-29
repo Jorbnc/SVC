@@ -16,13 +16,8 @@ end
 
 # ╔═╡ 24975543-a212-41eb-804a-3104ef0690f7
 begin
-	using Logging
-	Logging.disable_logging(Logging.Info);
-end
-
-# ╔═╡ 17161508-a4ad-4ac6-9ee2-1af84f0a1204
-begin
-	using HypertextLiteral,PlutoUI,LaTeXStrings, Latexify
+	using Logging,HypertextLiteral,PlutoUI,LaTeXStrings, Latexify
+	Logging.disable_logging(Logging.Info) # Disables printing on the (pluto) terminal
 end
 
 # ╔═╡ 2f36ece6-d7a2-4545-b45a-f437c1cf0c47
@@ -33,7 +28,10 @@ begin
 			size=(250,225),
 			tickfontsize=8,
 			color=:black
-	)	
+	)
+	function center_div(something)
+		@htl "<div align='center'>$something</div>"
+	end;
 end
 
 # ╔═╡ 36c32df0-a00e-11ec-1a33-8fbf1ea3ccbc
@@ -43,16 +41,34 @@ Notebook Size & Color Settings
 <style> .rich_output {color: black;}</style>
 """
 
-# ╔═╡ 31560726-b89b-4640-8d25-2f296a0af651
+# ╔═╡ 256756d6-d809-4589-b994-5938c8f17675
 # This allows to use the physics package of MathJax and it's LaTex macros. It's a LaTeX call ofc.
-md"""$\require{physics}$"""
+	md"""$\require{physics}$"""
 
-# ╔═╡ 2b139c2f-4348-4f72-a0a7-03c81dc9f8f6
+# ╔═╡ 54e7292e-823f-49a2-9463-a7e60c36589d
 TableOfContents(title="Limits of Functions")
 
-# ╔═╡ 5652bc55-292a-4677-921e-515cfba7e721
-function center_div(something)
-	@htl "<div align='center'>$something</div>"
+# ╔═╡ e280f46d-25f2-419b-a5eb-2de1f3bc427c
+begin
+	function circle(x_pos, y_pos, r)
+		θ = range(start=0, stop=2π, length=75)
+		x_pos .+ r*cos.(θ), y_pos .+ r*sin.(θ)
+	end
+	
+	function arc(x_pos, y_pos, θ1, θ2, r)
+		θ = range(start=θ1, stop=θ2, length=75)
+		x_pos .+ r*cos.(θ), y_pos .+ r*sin.(θ)
+	end
+
+	function sector(x_pos, y_pos, θ1, θ2, r)
+		θ1 = θ1%2π # Max input is 2π
+		θ2 = θ2%2π
+		θ = range(start=θ1, stop=θ2, length=50)
+		shape = Plots.Shape(x_pos .+ r*cos.(θ), y_pos .+ r*sin.(θ)) # Shape automatically fills color
+		append!(shape.x, 0) # appending origin to close the sector
+		append!(shape.y, 0) # notice that "shape" is a mutable struct
+		shape
+	end
 end
 
 # ╔═╡ 421b0b0e-0455-4e7f-a14e-ad9a045934f0
@@ -104,7 +120,7 @@ $\begin{align}
 # ╔═╡ 036d2162-49a8-4631-8532-b44cd6b16068
 md"""
 # Definition and Properties
-## 🔨 ϵ-δ definition of a Limit
+## ϵ-δ definition of a Limit
 Sea $x$ una variable, $f(x)$ una función y $x_0$ un valor particular de $x$, entonces un concepto intuitivo para el límite de una función es que, a medida que $x$ se aproxima a $x_0$, $f(x)$ se aproxima al valor límite $L$, i.e. $f(x_0) \approx L$. Sin embargo es necesaria una definición algebraica más rigurosa.
 """
 
@@ -182,24 +198,42 @@ let
 	x3 = Vector(-1:0.01:3)
 	replace!(x3, 2.0 => NaN) # To show jump discontinuity
 	
-	p = plot(x3, h.(x3), color = "black", line=2, xticks=([2], ["\$ x_0 \$"]), 
-		yticks=[], xlims=[-0.5, 3], label="f(x) by parts",
-		framestyle=:origin, right_margin=12mm, tickfontsize=latexticksize)
-	plot!([2,2],[0, h(2)], line=:dash, color="black")
-	hline!([2],  color=:red); hline!([6],  color=:red, line=:dash) 
-	vline!([1.75],  color=:blue); vline!([2.25],  color=:blue)
-	scatter!([2, 2], [h(1.99), h(2)], markersize=6, color=:white, markerstrokecolor=:black, label=false)
+	anim = @animate for i in 0:0.1:3
+		plot(x3, h.(x3), color = "black", line=2, xticks=([2], ["\$ x_0 \$"]), 
+			yticks=[], xlims=[-0.5, 3], label="f(x) by parts",
+			framestyle=:origin, right_margin=12mm, tickfontsize=latexticksize)
+		plot!([2,2],[0, h(2)], line=:dash, color="black")
+		hline!([h(1.99)-3+i],  color=:red); hline!([h(2)+3-i],  color=:red) 
+		vline!([1.5 + i/6],  color=:blue); vline!([2.5 - i/6],  color=:blue)
+		scatter!([2, 2], [h(1.99), h(2)], markersize=6, color=:white, markerstrokecolor=:black, label=false)
+	end
 	
-	center_div(p)
-end
+	g = gif(anim, fps=30)
+	#center_div(g)
 
-# ╔═╡ 55178e0a-79a8-45cf-9c89-42cc0ea1e6c3
-html"""
-Cambiar el gráfico por un un gif como el del video
-<div align='center'>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/kfF40MiS7zA?start=415" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div>
-"""
+	text = md"""Hay una restricción para el valor $\epsilon$. Al sobrepasarla,\
+	encontramos valores que no pertenecen al rango de $f(x)$"""
+	
+	@htl("""
+	<style>
+		.child{
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+		.inline-block-child{
+			display: inline-block;
+		}
+		.text-1{
+			transform: translateY(-150%)
+		}
+	</style>
+	
+	<div align='center'>
+		<div class='child inline-block-child'>$g</div>
+		<div class='child inline-block-child text-1' align='left'>$text</div>
+	</div>
+	""")
+end
 
 # ╔═╡ b63fe541-5cf7-4d3d-9a6d-35a3f24f9788
 md"""
@@ -678,17 +712,6 @@ $\begin{equation}
 \end{equation}$
 """
 
-# ╔═╡ 33022079-d8bd-466b-a41d-ed2fb6b3c5e0
-Print(latexify(:(f(x)=x>2 ? 3 : 4)))
-
-# ╔═╡ e47bd2b8-7cbc-45b4-b9b6-9b3340978afd
-md"""
-$f\left( x \right) = \begin{cases}
-3 & \text{if } \left( x > 2 \right)\\
-4 & \text{otherwise}
-\end{cases}$
-"""
-
 # ╔═╡ 4cfe9484-a471-49e5-9825-f88fc4c0785c
 md"""
 ## Product Law
@@ -824,16 +847,6 @@ $\begin{align}
 \end{align}$
 """
 
-# ╔═╡ dad86c6c-c59b-49b4-ad99-83bdfb88abe0
-md"""
-## 🔨 Composition Law
-"""
-
-# ╔═╡ 48abcbab-bc05-4f45-88a2-9637a2d1e7c7
-md"""
-## 🔨 Inverse Law
-"""
-
 # ╔═╡ e7acf793-29a8-4bd6-a01d-ff7f47572036
 md"""
 ## Squeeze Theorem
@@ -888,23 +901,10 @@ i.e. el límite para $g(x)$ existe y es $L$.
 """
 
 # ╔═╡ 4e6f285e-9487-4487-99e9-ee0738f8bdad
-begin
-	function circle(h, k, r)
-		θ = range(start=0, stop=2π, length=100)
-		k .+ r*cos.(θ), h .+ r*sin.(θ)
-	end
-	
-	function arc(h, k, θ1, θ2, r)
-		θ = range(start=θ1, stop=θ2, length=100)
-		k .+ r*cos.(θ), h .+ r*sin.(θ)
-	end
-
-	md"""
-	### Ex. 1
-	Demostrar que $\displaystyle\lim_{x \to 0}\sin(x)=0$
-	"""
-end
-
+md"""
+### Ex. 1
+Demostrar que $\displaystyle\lim_{x \to 0}\sin(x)=0$
+"""
 
 # ╔═╡ 3cfbb2da-841f-49c6-901a-a3dee69bc5f6
 let
@@ -1043,45 +1043,329 @@ let
 	x = Vector(-20:0.1:20)
 	replace!(x, 0 => NaN)
 	f(x) = sin(x)/x
-
+	
 	fig = plot(layout = grid(1,2), size=(550, 200),xticks=[], yticks=[])
 	# Left
 	plot!(fig[1], x, f.(x), line=2, 
 		framestyle=:origin, xticks=[i for i in -20:10:20], yticks=([1]), ylims=[-1,2])
 	# Right
-	plot!(fig[2], arc(0,0,0,π,1), framestyle=:origin, ylims=[-0.25,1.25])
 	α = π/4.5
+	plot!(fig[2], arc(0,0,0,π,1), framestyle=:origin, ylims=[-0.25,1.25])
 	plot!(fig[2], [cos(α),cos(α)], [0,sin(α)], line=(1.5, :blue))
 	plot!(fig[2], [0,1], [0,tan(α)])
 	plot!(fig[2], [1,1], [0,tan(α)], line=(1.5, :blue))
 	plot!(fig[2], arc(0,0,0,α,1), line=(2, :red))
-	plot!(fig[2], arc(0,0,0,α,0.5), line=(2, :red))
-	plot!(fig[2], range(start=0, stop=0.5, length=20), repeat([0], 20), 
-		fillrange=range(start=0, stop=0.5, length=20), fillalpha=0.40, c=:red)
+	plot!(fig[2], arc(0,0,0,α,0.25), line=(2, :red))
+	annotate!(fig[2], 0, 0, text("\$O\$", :top))
+	annotate!(fig[2], cos(α), 0, text("\$B\$", :top, :blue))
+	annotate!(fig[2], 1, 0, text("\$A\$", :top, :blue))
+	annotate!(fig[2], cos(α) - 0.1, sin(α) + 0.04, text("\$C\$", :right, :blue))
+	annotate!(fig[2], 1, tan(α), text("\$D\$", :bottom, :blue))
+	annotate!(fig[2], 0.3, 0.05, text("\$x\$", :bottom, :left, :red))
 	
 	center_div(fig)
 end
 
-# ╔═╡ 267dd87d-e64f-4ede-993d-104d23030a46
+# ╔═╡ 9497f822-c6bd-479e-a1ec-8f4c0261a271
 md"""
-plot!(x2, y1, fillrange=y2, fillalpha=0.40, c=:green)
+De la gráfica podemos notar que el límite parece ser $L=1$. Notemos además que Área[OAD] > Área[OAC] > Área[ABC]
+
+$\begin{align}
+\text{Área[OAD]} &= \frac{1}{2}(\overline{OA})(\overline{AD}) = \frac{1}{2}(1)|\tan(x)| \\
+x \to 0 \implies \text{Área[OAC]} &\approx \frac{1}{2}(1)|x| \\
+\text{Área[OBC]} &= \frac{1}{2}|\sin(x)||\cos(x)|
+\end{align}$
+
+Dividiendo cada expresión entre $\sin(x)$ y aplicando límites obtenemos
+
+$\begin{align}
+\lim_{x \to 0}\frac{1}{\cos(x)} 
+\geq \lim_{x \to 0}\abs{\frac{x}{\sin(x)}}
+\geq \lim_{x \to 0}\cos(x)
+\end{align}$
+
+(utilizamos $\geq$ porque a medida que $x \to 0$, los límites podrían ser iguales). Ahora, sabemos que $\displaystyle\lim_{x \to 0}\cos(x)=1$, entonces por *Squeeze Theorem* y *Quotient Law* tenemos
+
+$\begin{align}
+1 \geq \lim_{x \to 0}\abs{\frac{x}{\sin(x)}} \geq 1 &\implies \lim_{x \to 0}\abs{\frac{x}{\sin(x)}} = 1 \\
+	&\implies \lim_{x \to 0}|x| = \lim_{x \to 0}|\sin(x)| \\
+	&\implies \lim_{x \to 0}\abs{\frac{\sin(x)}{x}} = 1
+\end{align}$
+
+Pero cuando $x \to 0$, tanto $x$ como $\sin(x)$ tienen el mismo sigo, de modo que se cumple finalmente
+
+$\begin{align}
+\lim_{x \to 0}\frac{\sin(x)}{x} = 1
+\end{align}$
 """
 
-# ╔═╡ 9a011306-bcf8-40dd-be21-466f698a7c90
-begin
-	theme(:dark)
+# ╔═╡ 944b2cbc-c2af-44be-9244-3162fa3dbfb5
+md"""
+### Ex. 6
+Considera una torta circular de radio R. Una porción con ángulo central $\theta$ es cortada y ubicada en un plato circular de diámetro $D$ (diámetro mínimo para contener la porción en su totalidad). Demostrar que $D$ varía con respecto a $\theta$ de la siguiente forma:
+
+$D\left( \theta \right) = 
+\begin{cases}
+0 & \theta = 0 \\
+R\sec(\frac{\theta}{2}) & 0 < \theta \leq \frac{\pi}{2} \\
+2R\sin(\frac{\theta}{2}) & \frac{\pi}{2} < \theta \leq \pi \\
+2R & \pi < \theta \leq 2\pi 
+\end{cases}$
+
+Demostrar además que $\displaystyle\lim_{\theta \to 0}R\sec\left(\frac{\theta}{2}\right) = R$.
+
+**Cuadrante I**\
+El área circular mínima para el plato se obtiene al circunscribir la porción de torta tomando 3 puntos tangeciales: primer corte, segundo corte y origen. Para comprobar esto hay que observar que si redujéramos la circunferencia propuesta, alguno de los puntos tangenciales quedaría fuera
+"""
+
+# ╔═╡ aa252a99-a6d7-4591-a3b0-480b98c76832
+let
+	R = 1
+	θ = [π/6, π/3, π/2]
+	fig = plot(layout=grid(1,3), size=(750, 250), framestyle=:origin, xticks=[], yticks=[], 
+		xlims=[-R,R+0.2], ylims=[-R,R+0.2])
 	
-	x = LinRange(0,π,2021);  y =  2*cos.(x)
-	ymin, ymax = extrema(y)
-	c = [-1.; 1.]  # BAD < -1 ;  -1 < OK < 1;   GOOD > 1
-	cs = @. (c - ymin)/(ymax - ymin)   # map input data ranges to color scale 0-1 range:
-	my_cgrad2 = cgrad([:red,:white,:green], cs, categorical=true)
-	
-	scatter([-1 -1 -1],[0 0 0], mc=[:red :white :green],label=["BAD < -1" "-1 < OK < 1" "GOOD > 1"],marker=:rect, ratio=1)
-	plot!(x,y, fill=true,fill_z=y,fc=my_cgrad2, colorbar=false,clims=(ymin,ymax),lc=:black,
-	     xlabel="x", ylabel="y", widen=false,label=false, xlims=extrema(x),ylims=(-2.1,2.1))
-	plot!(xticks=([0, pi/3, 2pi/3, pi], ["0","π/3","2π/3", "π"]), dpi=300)
+	for i in 1:3
+		plot!(fig[i], circle(0,0,R), line=1.25) # Pie
+		plot!(fig[i], [0,R*cos(θ[i])], [0, R*sin(θ[i])], line=(:tomato, 1.5)) # 2nd cut
+		plot!(fig[i], circle(R/2, R*tan(θ[i]/2)/2, R*sec(θ[i]/2)/2), line=(1.5, :red)) # Plate
+		plot!(fig[i], sector(0,0,0,θ[i],R), line=0.2, c=:red, fillalpha=0.30) # Portion
+		plot!(fig[i], [0, R], [0, R*tan(θ[i]/2)], line=(1.25, :dash, :red)) # θ/2 projection
+		plot!(fig[i], [R, R], [0, R*tan(θ[i]/2)], line=(1.5, :blue)) # Tangent of θ/2
+	end
+
+	center_div(fig)
 end
+
+# ╔═╡ 89d33617-4ecf-4721-b8a1-c4d9631ba874
+md"""
+La proyección de la línea que divide a la porción en 2 mitades representa el diámetro del plato, ello porque su circunferencia es creada a partir de una simetría (ver *posición del plato* abajo). La línea vertical azul es $R\tan(\frac{\theta}{2})$. Este diámetro $D$ es entonces
+
+$\begin{align}
+D(\theta) &= \sqrt{R^2 + \left( R\tan\left(\frac{\theta}{2}\right)\right)^2} 
+	= R\sqrt{1 + \tan^{2}\left(\frac{\theta}{2}\right)} \\
+	&= R\sqrt{\frac{\cos^{2}(\frac{\theta}{2})}{\cos^{2}(\frac{\theta}{2})} 
+		+ \frac{\sin^{2}(\frac{\theta}{2})}{\cos^{2}(\frac{\theta}{2})}} 
+		= R\frac{1}{\cos(\frac{\theta}{2})} = R\sec\left(\frac{\theta}{2}\right)
+\end{align}$
+
+**Posición del plato**
+"""
+
+# ╔═╡ 9b43eba7-9823-48b1-904e-d8051a5414af
+let
+	R = 1
+	θ = π/3
+	p = plot(arc(0,0,0,π/2,R), framestyle=:origin, size=(200, 220), xticks=[], yticks=[]) # Pie Q=I
+	R_plate = R*sec(θ/2)/2
+	plot!(circle(R/2, R*tan(θ/2)/2, R_plate), line=(1.5, :red)) # Plate
+	plot!([0, R*cos(θ)], [0, R*sin(θ)], line=(:tomato, 1.5)) # 2nd cut
+	plot!(sector(0,0,0,θ,R), c=:red, fillalpha=0.2, line=0.2) # Portion
+	plot!([0, R], [0, R*tan(θ/2)], line=(1.25, :dash, :red)) # θ/2 projection
+	x_left = R/2-R_plate
+	Δy = R*tan(θ/2)/2
+	plot!([x_left,x_left+2*R_plate], [Δy,Δy], line=:red)
+	plot!([R/2,R/2], [0,Δy], line=:red)
+	annotate!(R/2+0.05, 0.15, text("\$ \\Delta y\$", 11, :red, :left))
+	annotate!(0.20, 0.23, text("\$ k \$", 11, :red, :left))
+
+	math = md"""
+	Tanto el punto tangencial de la izquierda cuanto el de la derecha\
+	son constantes en este cuadrante, por lo tanto, la posición en $x$ \
+	está determinada por $\frac{R}{2}$. En $y$ hay que notar
+
+	$\begin{align}
+	k\cos\left(\frac{\theta}{2}\right) = \frac{R}{2} &\implies k = \frac{R}{2\cos(\frac{\theta}{2})} \\
+	\Delta y = k\sin\left(\frac{\theta}{2}\right)
+		&\implies \Delta y = \frac{R}{2}\tan\left(\frac{\theta}{2}\right)
+	\end{align}$
+	"""
+	
+	@htl("""
+	<style>
+		.child{
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+		.inline-block-child{
+			display: inline-block;
+		}
+	</style>
+	
+	<div align='center'>
+		<div class='child inline-block-child'>$p</div>
+		<div class='child inline-block-child' align='left'>$math</div>
+	</div>
+	""")
+	
+end
+
+# ╔═╡ 153abed0-5370-4246-9f3a-23c491f7271f
+md"""
+**Cuadrante II**\
+Notemos que ahora el origen $O$ deja de ser un punto tangencial, y que el diámetro mínimo del plato estará determinado por ambos puntos de corte.
+"""
+
+# ╔═╡ f87e088b-44ab-447a-b7c8-4d1d791eefc5
+let
+	R = 1
+	θ = [4π/6, 5π/6, π]
+	fig = plot(layout=grid(1,3), size=(740, 250), framestyle=:origin, xticks=[], yticks=[], 
+		xlims=[-R,R+0.2], ylims=[-R,R+0.25])
+	
+	for i in 1:3
+		plot!(fig[i], circle(0,0,R), line=1.25) # Pie
+		plot!(fig[i], [0,R*cos(θ[i])], [0, R*sin(θ[i])], line=(:tomato, 1.5)) # 2nd cut
+		plot!(fig[i], circle((R*cos(θ[i]) + R)/2, R*sin(θ[i])/2, 2*R*sin(θ[i]/2)/2), line=(1.5, :red)) # Plate
+		plot!(fig[i], sector(0,0,0,θ[i],R), line=0.2, c=:red, fillalpha=0.30) # Portion
+		plot!(fig[i], [0, R*cos(θ[i]/2)], [0, R*sin(θ[i]/2)], line=(1.25, :dash)) # θ/2 projection
+		plot!(fig[i], [R,R*cos(θ[i])], [0,R*sin(θ[i])], line=(1.25, :red, :dash))
+	end
+
+	center_div(fig)
+end
+
+# ╔═╡ 2fe7bbdf-2fb3-4544-987e-f74c99ea938d
+md"""
+$\begin{align}
+D^2 &= (-R\cos(\theta) + R)^2 + (R\sin(\theta))^2 \\
+	&= (R(1-cos(\theta)))^2 + R^2\sin^{2}(\theta) \\
+	&= R^2 - 2R^2\cos(\theta) + R^2\cos^2(\theta) + R^2\sin^2(\theta) \\
+	&= 2R^2(1-\cos(\theta)) \\
+	&= 4R^2\frac{(1-\cos(\theta))}{2}, \quad \text{pero} \quad \sin^2(x)=\frac{1-\cos(2x)}{2} \\
+	&= 4R^2\sin^2\left(\frac{\theta}{2}\right) \\
+D &= 2R\sin\left(\frac{\theta}{2}\right)
+\end{align}$
+
+**Posición del plato**
+"""
+
+# ╔═╡ a2019faf-6fdf-4924-a0da-982892cde04b
+let
+	R = 1
+	θ = 4π/6
+	p = plot(circle(0,0,R), framestyle=:origin, size=(260, 270), xticks=[], yticks=[]) # Pie
+	R_plate = 2*R*sin(θ/2)/2
+	plot!(circle((R*cos(θ) + R)/2, R*sin(θ)/2, R_plate), line=(1.5, :red)) # Plate
+	plot!([0, R*cos(θ)], [0, R*sin(θ)], line=(:tomato, 1.5)) # 2nd cut
+	plot!(sector(0,0,0,θ,R), c=:red, fillalpha=0.2, line=0.2) # Portion
+	plot!([0, R*cos(θ/2)], [0, R*sin(θ/2)], line=(1.25, :dash)) # θ/2 projection
+	x_left = R/2-R_plate
+	Δy = R*sin(θ)/2
+	Δx = R*cos(θ/2)*cos(θ/2)
+	plot!([R,R*cos(θ)], [0,sin(θ)], line=(:red, :dash)) # Half of plate 1
+	plot!([-(R_plate-Δx),(R_plate+Δx)], [Δy,Δy], line=(:red)) # Half of plate 2
+	plot!([Δx,Δx],[0,Δy], line=:red) # Δy
+	annotate!(0.40, 0.20, text("\$ \\Delta y\$", 10, :red))
+	annotate!(0.08, 0.35, text("\$ k \$", 11, :red))
+	annotate!(0.65, 0.35, text("\$ l \$", 11, :red))
+	annotate!(0.17, -0.10, text("\$ \\Delta x \$", 10, :red))
+	annotate!(0.50, -0.15, text("\$ R \$", 10))
+
+	math = md"""
+	$\begin{align}
+	R &= k.\cos\left(\frac{\theta}{2}\right) + 
+		l.\cos\left(90 - \frac{\theta}{2}\right) \\
+	R &= k.\cos\left(\frac{\theta}{2}\right) + 
+		R\sin\left(\frac{\theta}{2}\right)\cos\left(90 - \frac{\theta}{2}\right) \\
+	R &= k.\cos\left(\frac{\theta}{2}\right) + 
+		R\sin\left(\frac{\theta}{2}\right)\sin\left(\frac{\theta}{2}\right)\\
+	R\cos^2\left(\frac{\theta}{2}\right) &= k.\cos\left(\frac{\theta}{2}\right) \implies 
+		k = R\cos\left(\frac{\theta}{2}\right) \\
+	\Delta x &= R\cos\left(\frac{\theta}{2}\right)\cos\left(\frac{\theta}{2}\right) \\
+	\Delta y &= R\cos\left(\frac{\theta}{2}\right)\sin\left(\frac{\theta}{2}\right) =
+		R\frac{\sin(\theta)}{2}
+	\end{align}$
+	
+	La última igualdad es resultado de la identidad $\sin(2x)=2\sin(x)\cos(x)$
+	"""
+	
+	@htl("""
+	<style>
+		.child{
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+		.inline-block-child{
+			display: inline-block;
+		}
+	</style>
+	
+	<div align='center'>
+		<div class='child inline-block-child'>$p</div>
+		<div class='child inline-block-child' align='left'>$math</div>
+	</div>
+	""")
+	
+end
+
+# ╔═╡ 258c0007-0600-405d-a6fd-150ec2ea2542
+md"""
+**Cuadrantes III y IV**\
+El diámetro y la posición del plato son los mismos que cuando $\theta = \pi$ en el último cuadrante, y son constantes hasta $\theta = 2\pi$.
+
+**Límite:**
+
+$\begin{align}
+\lim_{\theta \to 0}R\sec\left(\frac{\theta}{2}\right) 
+	&= R\lim_{\theta \to 0}\sec\left(\frac{\theta}{2}\right) \\
+	&= R\frac{1}{\displaystyle\lim_{\theta \to 0}\cos\left(\frac{\theta}{2}\right)} \\
+	&= R\frac{1}{\cos(0)} = R
+\end{align}$
+
+"""
+
+# ╔═╡ dad86c6c-c59b-49b4-ad99-83bdfb88abe0
+md"""
+## 🔨 Composition Law
+Sean los límites $\displaystyle\lim_{x \to c}g(x) = M$ y $\displaystyle\lim_{u \to M}f(u)=f(M)$ (se utiliza $u$ para distinguir que es el input de $f$ ), entonces
+
+$\begin{align}
+\boxed{\lim_{x \to c}f(g(x)) = f(M)}
+\end{align}$
+
+o equivalentemente
+
+$\begin{align}
+\boxed{\lim_{x \to c}f(g(x)) = f(\lim_{x \to c}g(x))}
+\end{align}$
+
+si y solo si $\forall\epsilon>0, \exists\delta>0$ tal que
+
+$\begin{align}
+0 < |x - c| < \delta \implies |f(g(x)) - f(M)| < \epsilon
+\end{align}$
+
+**Demostración**\
+Ya que $\displaystyle\lim_{u \to M}f(u)=f(M)$ (i.e. la función es continua en $M$), entonces $\forall  \epsilon>0, \exists \delta_1>0$ tal que
+
+$\begin{align}
+0 < |u - M| < \delta_1 \implies |f(u) - f(M)| < \epsilon
+\end{align}$
+
+Sin embargo, notemos que cuando $u=M \implies f(u) = f(M) \implies |f(u) - f(M)|=0$, de modo que el antecedente de la implicación anterior varía para incluir al cero
+
+$\begin{align}
+0 \leq |u - M| < \delta_1 \implies |f(u) - f(M)| < \epsilon
+\end{align}$
+
+Ahora definamos $\epsilon_{2}=\delta_{1}$. Ya que $\displaystyle\lim_{x \to c}g(x) = M$ entonces $\forall\epsilon_2, \exists\delta$ tal que
+
+$\begin{align}
+0 < |x - c| < \delta \implies |g(x) - M| < \epsilon_2
+\end{align}$
+
+Definamos además $u=g(x)$. Obtenemos finalmente 
+
+$\begin{align}
+0 < |x - c| < \delta \implies 0 \leq |u - M| < \delta_1 \implies |f(g(x)) - f(M)| < \epsilon
+\end{align}$
+"""
+
+# ╔═╡ 48abcbab-bc05-4f45-88a2-9637a2d1e7c7
+md"""
+## 🔨 Inverse Law
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2008,13 +2292,12 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╠═36c32df0-a00e-11ec-1a33-8fbf1ea3ccbc
-# ╠═24975543-a212-41eb-804a-3104ef0690f7
-# ╠═17161508-a4ad-4ac6-9ee2-1af84f0a1204
-# ╠═31560726-b89b-4640-8d25-2f296a0af651
-# ╠═2f36ece6-d7a2-4545-b45a-f437c1cf0c47
-# ╠═2b139c2f-4348-4f72-a0a7-03c81dc9f8f6
-# ╠═5652bc55-292a-4677-921e-515cfba7e721
+# ╟─36c32df0-a00e-11ec-1a33-8fbf1ea3ccbc
+# ╟─24975543-a212-41eb-804a-3104ef0690f7
+# ╟─256756d6-d809-4589-b994-5938c8f17675
+# ╟─2f36ece6-d7a2-4545-b45a-f437c1cf0c47
+# ╠═54e7292e-823f-49a2-9463-a7e60c36589d
+# ╟─e280f46d-25f2-419b-a5eb-2de1f3bc427c
 # ╟─421b0b0e-0455-4e7f-a14e-ad9a045934f0
 # ╟─566c013f-84d8-4285-a2d9-215634878a4a
 # ╟─036d2162-49a8-4631-8532-b44cd6b16068
@@ -2023,7 +2306,6 @@ version = "0.9.1+5"
 # ╟─eb2ddf37-2196-413a-955c-7e84e82df760
 # ╟─759f4a8e-4fda-465c-a4bc-65f52af912ef
 # ╟─07681221-bc0c-4545-b2d9-18f57cb072c8
-# ╟─55178e0a-79a8-45cf-9c89-42cc0ea1e6c3
 # ╟─b63fe541-5cf7-4d3d-9a6d-35a3f24f9788
 # ╟─b6005254-921d-40bf-a64a-8841d32154db
 # ╟─40d0c591-3b51-4cee-a504-5724334ab0ba
@@ -2052,13 +2334,9 @@ version = "0.9.1+5"
 # ╟─34c2aef1-93d7-4ce0-bede-fed0fbe96830
 # ╟─f5d6c493-0b90-4e8d-8ce9-1934fa8bdf78
 # ╟─8807d000-a3e7-4c42-a633-74b650554990
-# ╟─33022079-d8bd-466b-a41d-ed2fb6b3c5e0
-# ╟─e47bd2b8-7cbc-45b4-b9b6-9b3340978afd
 # ╟─4cfe9484-a471-49e5-9825-f88fc4c0785c
 # ╟─e8b0c960-e0e9-4d0b-8e09-86d016047f8f
 # ╟─6e8c04e9-d8ec-48aa-a15f-2bcebd938541
-# ╟─dad86c6c-c59b-49b4-ad99-83bdfb88abe0
-# ╟─48abcbab-bc05-4f45-88a2-9637a2d1e7c7
 # ╟─e7acf793-29a8-4bd6-a01d-ff7f47572036
 # ╟─98121e66-e9a1-4e2c-aef1-ac31b8ef5ed1
 # ╟─9b7414a7-91bb-4f10-8d49-bb4ca11540b8
@@ -2069,8 +2347,18 @@ version = "0.9.1+5"
 # ╟─7ac5267f-db3f-43ae-a970-c84a7bc73458
 # ╟─ba441314-8209-43e4-80a2-1d6edbe215ba
 # ╟─3fd3102d-f27a-4a65-a540-f2f19c6804c9
-# ╠═366553b0-0f28-4e3c-a533-5a73a3a23d79
-# ╠═267dd87d-e64f-4ede-993d-104d23030a46
-# ╠═9a011306-bcf8-40dd-be21-466f698a7c90
+# ╟─366553b0-0f28-4e3c-a533-5a73a3a23d79
+# ╟─9497f822-c6bd-479e-a1ec-8f4c0261a271
+# ╟─944b2cbc-c2af-44be-9244-3162fa3dbfb5
+# ╟─aa252a99-a6d7-4591-a3b0-480b98c76832
+# ╟─89d33617-4ecf-4721-b8a1-c4d9631ba874
+# ╟─9b43eba7-9823-48b1-904e-d8051a5414af
+# ╟─153abed0-5370-4246-9f3a-23c491f7271f
+# ╟─f87e088b-44ab-447a-b7c8-4d1d791eefc5
+# ╟─2fe7bbdf-2fb3-4544-987e-f74c99ea938d
+# ╟─a2019faf-6fdf-4924-a0da-982892cde04b
+# ╟─258c0007-0600-405d-a6fd-150ec2ea2542
+# ╟─dad86c6c-c59b-49b4-ad99-83bdfb88abe0
+# ╟─48abcbab-bc05-4f45-88a2-9637a2d1e7c7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
