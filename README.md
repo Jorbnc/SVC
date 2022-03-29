@@ -1,6 +1,8 @@
 # Contenido
 
 - Limits
+  - Epsilon-delta definition
+  - Limit Laws
 - Continuity
 - Derivatives
 
