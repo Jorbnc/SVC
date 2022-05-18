@@ -3,11 +3,12 @@
 
 # Contents
 
+- Fundamentos
+- ...
 - Limits
   - Epsilon-delta definition
   - Limit Laws
-- Continuity
-- Derivatives
+- ...
 
 # Template
 
