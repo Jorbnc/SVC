@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.4
+# v0.19.14
 
 using Markdown
 using InteractiveUtils
@@ -67,7 +67,6 @@ begin
 		append!(shape.y, 0) # notice that "shape" is a mutable struct
 		shape
 	end
-	print()
 end
 
 # ╔═╡ 421b0b0e-0455-4e7f-a14e-ad9a045934f0
@@ -253,12 +252,14 @@ Además, es necesario que $x \neq x_0$ porque $f(x_0)$ podría no estar definido
 !!! warning ""
 	La condición para la existencia del límite $L$ de una función $f(x)$ en el punto $x_0$ puede expresarse como
 
-	$\lim_{x \to x_0} f(x) = L \iff ∀ϵ > 0, ∃δ > 0 : 0 < |x − x_0| < δ \implies |f(x) − L| < ϵ$
+	$\lim_{x \to x_0} f(x) = L$
 
-!!! asdf ""
-	A partir de ahora consideraremos implícito, pero no trivial, que lo anterior se cumple $∀x ∈ Dom[f(x)]$.
+	si y solo si
+	
+	$∀ϵ > 0, ∃δ > 0 : \quad  ∀x ∈ Dom(f), \quad 0 < |x − x_0| < δ \implies |f(x) − L| < ϵ$
 
-### Ex. 1
+### Ejemplos
+**Ejemplo 1**\
 Sea $f(x)=3x^2 + 2x + 1$, se desea demostrar que $\displaystyle \lim_{x \to 2}f(x)=17$. Hallar un valor $\delta$ para un $\epsilon = 0.5$, es decir, para que $\lvert(f(x) - 17)\rvert < 0.5$ 
 """
 
@@ -342,7 +343,7 @@ md"""
 
 # ╔═╡ 42091779-4db6-487c-98d0-7e942bceeca4
 md"""
-### Ex. 2
+**Ejemplo 2**\
 ¿Cómo podríamos proceder si no tenemos inicialmente un valor $\epsilon$ específico?\
 Uno de los métodos comunes incluye
 - Limitar el análisis a un intervalo simétrico inicial que incluya -por supuesto- al punto de interés $(x_0, f(x_0))$
@@ -391,7 +392,7 @@ $\begin{align}
 
 # ╔═╡ 1989b181-071b-4884-accb-5fd028019d76
 md"""
-### Ex. 3
+**Ejemplo 3**\
 Sea $f(x) = \displaystyle{\sqrt{x^2+5}}$. Demostrar que $\displaystyle{\lim_{x \to -2}f(x)=3}$. Expresar $\delta$ en función de $\epsilon$.\
 
 Empezaremos con expresar $|f(x)-L|$ en términos que incluyan $\textcolor{blue}{|x-x_0|=|x-(-2)|}$
@@ -446,11 +447,7 @@ end
 
 # ╔═╡ 1229263d-4217-4b7b-997f-48f9146df094
 md"""
-### Ex. 4
-"""
-
-# ╔═╡ 25d559c7-124f-468e-af85-9754036d6786
-md"""
+**Ejemplo 4**\
 Sea $f(x)=|x^3|$. Demostrar que $\displaystyle \lim_{x \to -1}f(x)=1$, Expresar $\delta$ en función de $\epsilon$
 
 Notemos que $|x^3|=|x|^3$. Además, por diferenia de cubos $\;a^3 - b^3 = (a-b)(a^2+ab+b^2)$ se obtiene
@@ -477,6 +474,97 @@ $\begin{align}
 \end{align}$
 
 Finalmente, es suficiente que $\delta \leq \min\left(1, \frac{\epsilon}{7}\right)$ para concluir la demostración.
+"""
+
+# ╔═╡ 25d559c7-124f-468e-af85-9754036d6786
+md"""
+**Ejemplo 5**\
+ Sea $f(x) = \begin{cases} 0 & x \text{ es irracional} \\ \frac{1}{q} & x = \frac{p}{q} \text{ (fracción irreducible)} \end{cases},\quad$ demostrar que si $0 < a < 1 \implies f(a) \to 0$.
+"""
+
+# ╔═╡ 7f5b157f-0751-45c7-99d1-3e8b976462b2
+let
+	arr1 = unique([(isa(p//q, Rational) && p//q < 1) && p//q for p in 1:10, q in 1:10])[2:end]
+	arr2 = [1//denominator(x) for x in arr1]
+	center_div(scatter(arr1, arr2, size=(500, 300)))
+end
+
+# ╔═╡ 0d04d5c6-ef14-4bb2-ae63-5c2c65f9de4c
+md"""
+Sea $\epsilon>0$ un número muy pequeño, entonces
+- Solo cuando $x$ toma alguno de los valores $\frac{p}{q}$, la expresión $|f(x) - L| = |\frac{p}{q} - 0| < \epsilon$ podría ser falsa 
+- Si $a$ es irracional, podemos elegir como $\delta$ al número $|\frac{p}{q} - a|$, donde $\frac{p}{q}$ es el racional irreducible más cerano
+  + Cuando $a$ está en la mitad de $2$ de estos números, el valor de $\delta$ es el mismo para ambos casos, así que el caso es trivial.
+- Si $a$ es alguno de estos números $\frac{p}{q}$, entonces podemos elegir como $\delta$ al valor $\frac{p}{q}$ más cercano, por supuesto donde $\frac{p}{q} \neq a$
+En ambos casos puede observarse que si $0 < |x - a| < \delta \implies |f(x) - a| < \epsilon \;\blacksquare$
+"""
+
+# ╔═╡ 6cdc9fd9-b81f-4afe-bcfe-963bb9500aaa
+md"""
+## El límite no existe
+Para que se de la no existencia del límite, se debe negar apropiadamente la expresión de existencia
+
+$∀ϵ > 0, ∃δ > 0 : \quad  ∀x ∈ Dom(f), \quad 0 < |x − x_0| < δ \implies |f(x) − L| < ϵ.$
+
+Entonces
+
+!!! warning ""
+	El límite de $f(x)$ en $x_0$ no existe cuando
+	
+	$\exists\epsilon>0, \forall\delta>0: \quad \exists x \in Dom(f), \quad 0 < \abs{x-x_0} < \delta \;\land\; \abs{f(x)-L} < \epsilon$
+
+
+**Ejemplo 1**\
+Sea $f(x) = \sin\left(\frac{1}{x}\right)$. Demostrar que $\lim_{x \to 0}f(x)$ no existe
+"""
+
+# ╔═╡ 846e79fc-ddc1-47cc-bb26-0a1b06825576
+let
+	x = collect(-0.05:0.00001:0.05)
+	f(x) = sin(1/x)
+	replace!(x, 0 => NaN)
+	center_div(plot(x, f.(x), size=(500,250)))
+end
+
+# ╔═╡ 2d0cd818-02aa-410b-bc12-44321672e785
+md"""
+A medidad que $x$ va acercándose a $0$, la función oscila de forma acelerada entre los valores $-1$ y $1$, sin detenerse. Si tomamos cualquier valor $\epsilon < 1$, notaremos que ello delimitará un intervalo en $x$ que siempre tendrá valores tales que $|f(x)-0|>\epsilon$ (e.g. $\epsilon=0.5$ delimita un intervalo en el que existen infinitos valores $x$ tales que $f(x)>0.5$) $\;\blacksquare$
+"""
+
+# ╔═╡ db794550-de11-4b9b-9d1f-042687172a88
+md"""
+## Existencia de un único límite
+
+Una función no puede aproximarse a $2$ valores distintos cerca a $x_0$. Es decir,
+
+!!! warning ""
+
+	$\displaystyle\lim_{x \to x_0}f(x) = L_1 \;\land\; \lim_{x \to x_0}f(x) = L_2 \implies L_1 = L_2$
+
+Por las 2 premisas en el antecedente de la implicación tenemos que
+-  $\forall\epsilon, \exists\delta_{1}: \forall x \in Dom(f), 0 < |x - x_0| < \delta_{1} \implies |f(x) - L_{1}| < \epsilon$
+-  $\forall\epsilon, \exists\delta_{2}: \forall x \in Dom(f), 0 < |x - x_0| < \delta_{2} \implies |f(x) - L_{2}| < \epsilon$
+
+Si elegimos $\delta = \min(\delta_1, \delta_2)$, entonces podemos obtener
+
+$\forall\epsilon, \exists\delta: \forall x \in Dom(f), 0 < |x - x_0| < \delta \implies |f(x) - L_{1}| < \epsilon \;\land\; |f(x) - L_{2}| < \epsilon$
+
+(ir a **Ley de la Suma** para una visualización de esta conclusión)
+
+Ahora, asumiendo que $L_1 \neq L_2$, si hallamos un $\epsilon$ en particular para el cual no podrían cumplirse simultáneamente $|f(x) - L_{1}| < \epsilon\;$ y $\;|f(x) - L_{2}| < \epsilon$ (ya que la definición de límite considera a todos los epsilons, i.e. $\forall\epsilon ...$), entonces habríamos concluído la demostración.
+
+Consideremos $\epsilon = \frac{|L_1 - L_2|}{2} > 0\;$ (ya que $L_1 \neq L_2$), entonces
+
+$\exists\delta : \forall x \in Dom(f), 0 < |x - a| < \delta \implies |f(x) - L_1| < \frac{|L_1 - L_2|}{2} \;\land\; |f(x) - L_2| < \frac{|L_1 - L_2|}{2}$
+
+Lo que a su vez implica que
+
+$\begin{align}
+|L_1 - L_2| &= |L_1 - f(x) + f(x) - L_2| \leq |L_1 - f(x)| + |f(x) - L_2| < \frac{|L_1 - L_2|}{2} + \frac{|L_1 - L_2|}{2}\\
+|L_1 - L_2| &< |L_1 - L_2|
+\end{align}$
+
+lo cual es contradictorio. $\blacksquare$
 """
 
 # ╔═╡ 0f374503-9eee-4ed5-a5ed-dbec6a67ef47
@@ -634,7 +722,7 @@ let
 	x = Vector(-0.5:0.01:0.5)
 	x0 = 0
 
-	anim = @animate for i in (0:0.0025:0.135)
+	anim = @animate for i in (0:0.001:0.135)
 		plot(x, f.(x), color=:red, line=2, ylims=[0, 1.8], size=(350, 300), top_margin=5mm,
 			xticks=([x0],["\$x_0\$"]), yticks=([f(x0),g(x0)],["\$L_1\$", "\$L_2\$"]),
 			tickfontsize=15)
@@ -1378,13 +1466,12 @@ md"""
 
 # ╔═╡ b5b21cfc-f471-49d6-bd6e-14c65fc018b1
 md"""
-**Referencias**
+# Referencias
 
-|Autor(es)|Publicación|Año||
+|Autor(es)|Publicación|Año|Capítulos|
 |:--|:--|:--:|:--:|
-|Serge Lang|Basic Mathematics|1971|
 |C. Allendoerfer & C. Oakley|Principles of Mathematics (2nd ed.)|1963|
-|Michael Spivak|Calculus (4th ed.)|2008|🔨|
+|Michael Spivak|Calculus (4th ed.)|2008|5|
 |Tom M. Apostol|Calculus Vol. 1 (2nd ed.)|1967|🔨|
 
 - [brilliant.org](https://brilliant.org/wiki/epsilon-delta-definition-of-a-limit/)
@@ -1413,8 +1500,9 @@ PlutoUI = "~0.7.37"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.1"
+julia_version = "1.8.0"
 manifest_format = "2.0"
+project_hash = "39edd9970e795329dd604413713e5aa8257908fa"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1430,6 +1518,7 @@ version = "3.3.3"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.1"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -1488,6 +1577,7 @@ version = "3.42.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "0.5.2+0"
 
 [[deps.Contour]]
 deps = ["StaticArrays"]
@@ -1530,8 +1620,9 @@ uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.8.6"
 
 [[deps.Downloads]]
-deps = ["ArgTools", "LibCURL", "NetworkOptions"]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
 
 [[deps.EarCut_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1556,6 +1647,9 @@ deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers",
 git-tree-sha1 = "d8a578692e3077ac998b50c0217dfd67f21d1e5f"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.4.0+0"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -1743,10 +1837,12 @@ version = "0.15.14"
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.3"
 
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "7.84.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -1755,6 +1851,7 @@ uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.10.2+0"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -1839,6 +1936,7 @@ version = "1.0.3"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.28.0+0"
 
 [[deps.Measures]]
 git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
@@ -1856,6 +1954,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2022.2.1"
 
 [[deps.NaNMath]]
 git-tree-sha1 = "737a5957f387b17e74d4ad2f440eb330b39a62c5"
@@ -1864,6 +1963,7 @@ version = "1.0.0"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
 
 [[deps.Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1874,6 +1974,7 @@ version = "1.3.5+1"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.20+0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1913,6 +2014,7 @@ version = "0.40.1+0"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.8.0"
 
 [[deps.PlotThemes]]
 deps = ["PlotUtils", "Requires", "Statistics"]
@@ -1950,9 +2052,9 @@ uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [[deps.Qt5Base_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "xkbcommon_jll"]
-git-tree-sha1 = "c6c0f690d0cc7caddb74cef7aa847b824a16b256"
+git-tree-sha1 = "0c03844e2231e12fda4d0086fd7cbe4098ee8dc5"
 uuid = "ea2cea3b-5b76-57ae-a6ef-0a8af62496e1"
-version = "5.15.3+1"
+version = "5.15.3+2"
 
 [[deps.REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
@@ -1992,6 +2094,7 @@ version = "1.3.0"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
 
 [[deps.Scratch]]
 deps = ["Dates"]
@@ -2056,6 +2159,7 @@ version = "0.6.5"
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.0"
 
 [[deps.TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
@@ -2072,6 +2176,7 @@ version = "1.7.0"
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.0"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
@@ -2253,6 +2358,7 @@ version = "1.4.0+3"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.12+3"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2269,6 +2375,7 @@ version = "0.15.1+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl", "OpenBLAS_jll"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "5.1.1+0"
 
 [[deps.libfdk_aac_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2291,10 +2398,12 @@ version = "1.3.7+1"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.48.0+0"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "17.4.0+0"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2316,9 +2425,9 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─36c32df0-a00e-11ec-1a33-8fbf1ea3ccbc
-# ╟─24975543-a212-41eb-804a-3104ef0690f7
-# ╟─256756d6-d809-4589-b994-5938c8f17675
+# ╠═36c32df0-a00e-11ec-1a33-8fbf1ea3ccbc
+# ╠═24975543-a212-41eb-804a-3104ef0690f7
+# ╠═256756d6-d809-4589-b994-5938c8f17675
 # ╠═54e7292e-823f-49a2-9463-a7e60c36589d
 # ╟─e280f46d-25f2-419b-a5eb-2de1f3bc427c
 # ╟─421b0b0e-0455-4e7f-a14e-ad9a045934f0
@@ -2343,6 +2452,12 @@ version = "0.9.1+5"
 # ╟─cbcae415-33d5-49eb-b018-b8a9d1ebbc08
 # ╟─1229263d-4217-4b7b-997f-48f9146df094
 # ╟─25d559c7-124f-468e-af85-9754036d6786
+# ╟─7f5b157f-0751-45c7-99d1-3e8b976462b2
+# ╟─0d04d5c6-ef14-4bb2-ae63-5c2c65f9de4c
+# ╟─6cdc9fd9-b81f-4afe-bcfe-963bb9500aaa
+# ╟─846e79fc-ddc1-47cc-bb26-0a1b06825576
+# ╟─2d0cd818-02aa-410b-bc12-44321672e785
+# ╟─db794550-de11-4b9b-9d1f-042687172a88
 # ╟─0f374503-9eee-4ed5-a5ed-dbec6a67ef47
 # ╟─c8fc7960-689a-40d7-b006-cc5b7ebc32bc
 # ╟─fe6fd0ed-3543-4616-af2c-ae843e4aff7f
